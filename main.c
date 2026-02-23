@@ -58,6 +58,7 @@ void SearchStudent(){
 
     printf("Enter Roll No to Search:");
     scanf("%d",&roll);
+    getchar();
 
     while (fread(&s,sizeof(s),1,fp)){
         if (s.roll_no == roll){
@@ -101,15 +102,98 @@ void DisplayStudent(){
         );
         found = 1;
     }
-    printf("\n---------------------------------------------------------------------------\n");
     fclose(fp);
     if (!found){
         printf("No Student to Display");
     }
+    printf("\n---------------------------------------------------------------------------\n");
 }
 
 void UpdateStudent(){
+    FILE *fp,*temp;
+    struct student s;
+    int roll,found = 0;
 
+    fp = fopen("data/student.dat","rb");
+    temp = fopen("data/temp.dat","wb");
+    if (fp == NULL || temp == NULL){
+        printf("File could not be opened");
+        return;
+    }
+
+    printf("Enter Roll No to be Updated: ");
+    scanf("%d",&roll);
+    getchar();
+
+    while (fread(&s,sizeof(s),1,fp)){
+        if (s.roll_no == roll){
+            printf("Enter Student Name:");
+            fgets(s.name,sizeof(s.name),stdin);
+            s.name[strcspn(s.name, "\n")] = 0;
+
+            printf("Enter Fathers Name:");
+            fgets(s.fname,sizeof(s.fname),stdin);
+            s.fname[strcspn(s.fname, "\n")] = 0; 
+
+            printf("Enter Age:");
+            scanf("%d",&s.age);
+            getchar();
+
+            printf("Enter Marks:");
+            scanf("%f",&s.marks);
+            getchar();
+
+            found = 1;
+        }
+        fwrite(&s,sizeof(s),1,temp);
+    }
+    fclose(fp);
+    fclose(temp);
+    remove("data/student.dat");
+    rename("data/temp.dat","data/student.dat");
+    
+    if(!found){
+        printf("No data found");
+    }
+    else{
+        printf("Data updated Successfully");
+    }
+}
+
+void DeleateStudent(){
+    FILE *fp,*temp;
+    struct student s;
+    int roll,found = 0;
+
+    fp = fopen("data/student.dat","rb");
+    temp = fopen("data/temp.dat","wb");
+    if (fp == NULL || temp == NULL){
+        printf("File could not be opened");
+        return;
+    }
+
+    printf("Enter Roll No to be Deleted: ");
+    scanf("%d",&roll);
+    getchar();
+
+    while (fread(&s,sizeof(s),1,fp)){
+        if (s.roll_no == roll){
+            found = 1;
+            continue;
+        }
+        fwrite(&s,sizeof(s),1,temp);
+    }
+    fclose(fp);
+    fclose(temp);
+    remove("data/student.dat");
+    rename("data/temp.dat","data/student.dat");
+    
+    if(!found){
+        printf("No data found");
+    }
+    else{
+        printf("Data Deleted Successfully");
+    }
 }
 
 int main(){
@@ -135,6 +219,14 @@ int main(){
             break;
         case 3:
             DisplayStudent();
+            break;
+        case 4:
+            UpdateStudent();
+            break;
+        case 5:
+            DeleateStudent();
+            break;
+        case 6:
             break;
         default:
             printf("Invalid Choice\n");
